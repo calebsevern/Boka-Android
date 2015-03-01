@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -21,12 +22,15 @@ import android.os.StrictMode;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TableLayout.LayoutParams;
 import android.widget.Toast;
 
 public class PromptActivity extends Activity {
-
+	
+	ProgressDialog dialog = null;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 				
@@ -35,84 +39,140 @@ public class PromptActivity extends Activity {
 	}
 
 	@Override
+	protected void onStart() {
+		super.onStart();
+
+		getActionBar().setTitle("Book Search");   
+		dialog = ProgressDialog.show(PromptActivity.this, "", 
+                "Consulting the oracles...", true);
+		
+	}
+	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.prompt, menu);
-		
 		doStuff();
 		return true;
 	}
 	
 	 protected void doStuff() {
+		 
+		 	/*
+		 	 * 	"Search Again" button listener
+		 	 */
+		 
+			 Button button= (Button) findViewById(R.id.search_again);
+			 button.setOnClickListener(new View.OnClickListener() {
+			     @Override
+			     public void onClick(View v) {
+		    		 Intent myIntent = new Intent(PromptActivity.this, MainActivity.class);
+			    	 PromptActivity.this.startActivity(myIntent);
+			     }
+			 });
+		 
+		 	
 		 	StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 			StrictMode.setThreadPolicy(policy); 
-			final Handler handler = new Handler();
-
+			//final Handler handler = new Handler();
+			
 			final Context c = getApplicationContext();
-			final Runnable r = new Runnable() {
-			    public void run() {
+			
+			Thread t = new Thread(new Runnable() { public void run() { 
 			        
-			    	
 			    	try {
 						
 						Intent intent = getIntent();
 						String value = intent.getStringExtra("isbn");
-						Toast.makeText(getApplicationContext(), value, Toast.LENGTH_LONG).show();
+						getActionBar().setTitle(value);   
+						
+						tweetPrice(value);
+						//Toast.makeText(getApplicationContext(), value, Toast.LENGTH_LONG).show();
 						
 						//0538497815
 				        URL yahoo = new URL("http://severn.me/projects/Boka/lookup.php?isbn=" + value);
 				        URLConnection yc = yahoo.openConnection();
+				        yc.setConnectTimeout(10000);
 				        BufferedReader in = new BufferedReader(
 				                                new InputStreamReader(
 				                                yc.getInputStream()));
 				        String inputLine = in.readLine();
 				        JSONArray links = new JSONArray(inputLine);
+
+						//Toast.makeText(getApplicationContext(), links.length() + " result(s) found.", Toast.LENGTH_LONG).show();
 				        for(int i=0; i<links.length(); i++) {
 				        	String json = (String) links.get(i);
 				        	final JSONObject temp = new JSONObject(json.substring(json.indexOf("{"), json.lastIndexOf("}") + 1));
-				        	System.out.println("Magnet: " + temp.getString("magnet"));
-				        	//String magnet = l.getString("magnet");
-				        	//System.out.println("Magnet: " + magnet);
+				        	//System.out.println("Magnet: " + temp.getString("magnet"));
 				        	
 				        	LinearLayout layout = (LinearLayout) findViewById(R.id.buttons_here);
 			                Button btnTag = new Button(c);
-			                btnTag.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+			                LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			                params.setMargins(0, 0, 0, 0);
+			                btnTag.setLayoutParams(params);
 			                btnTag.setText(temp.getString("title"));
 			                btnTag.setId(i);
-			                layout.addView(btnTag);
-			                //((Button) findViewById(i)).setOnClickListener(this);
-			                btnTag.setOnClickListener(new View.OnClickListener() {
-			                    @Override
-			                    public void onClick(View v) {
-			                    	try {
-										//Toast.makeText(getApplicationContext(), temp.getString("title"), Toast.LENGTH_LONG).show();
-										Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(temp.getString("magnet")));
-										startActivity(browserIntent);
-									} catch (JSONException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-			                    }
-			                });
+			                
+			                addButton(btnTag, temp.getString("magnet"));
 				        }
-				        
+				        dialog.dismiss();
 				        in.close();
 					} catch(Exception e) {
 						StringWriter sw = new StringWriter();
 						PrintWriter pw = new PrintWriter(sw);
-						e.printStackTrace(pw);
-						sw.toString();
-						System.out.println("nope: " + sw);
+						System.out.println("SHIT");
+						e.printStackTrace();
 					} 
 			        
-			        
-			        
-			    }
-			};
-
-			handler.postDelayed(r, 0);
-			
-			
+			}});
+			t.start();
+			//runOnUiThread(t);
+			//r.run();
+			//handler.postDelayed(r, 0);
+	 }
+	 
+	 protected void tweetPrice(final String isbn) {
+		 Thread t = new Thread(new Runnable() { public void run() { 
+		        
+		    	try {
+					System.out.println("http://severn.me/projects/Boka/tweet.php?isbn=" + isbn);
+			        URL yahoo = new URL("http://severn.me/projects/Boka/tweet.php?isbn=" + isbn);
+			        URLConnection yc = yahoo.openConnection();
+			        yc.setConnectTimeout(10000);
+			        BufferedReader in = new BufferedReader(
+			                                new InputStreamReader(
+			                                yc.getInputStream()));
+			        String input = in.readLine();
+			        System.out.println("Response: " + input);
+			        in.close();
+			        System.out.println("TWEETED");
+				} catch(Exception e) {
+					StringWriter sw = new StringWriter();
+					System.out.println("NOT TWEETED");
+					e.printStackTrace();
+				} 
+		        
+		}});
+		t.start();
+	 }
+	 
+	 protected void addButton(final Button b, final String magnet) {
+		 Thread t = new Thread(new Runnable() { public void run() { 
+		        
+					
+		        	LinearLayout layout = (LinearLayout) findViewById(R.id.buttons_here);
+	                layout.addView(b);
+	                b.setOnClickListener(new View.OnClickListener() {
+	                    @Override
+	                    public void onClick(View v) {
+	                    	Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(magnet));
+							startActivity(browserIntent);
+	                    }
+	                });
+			   }
+		        
+		});
+		runOnUiThread(t);
 	 }
 
 }

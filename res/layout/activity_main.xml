@@ -7,43 +7,58 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity" >
+    android:background="#59ABE3"
+    android:padding="0dp"
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="72dp"
         android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textView1"
+       		style="@style/BokaLogo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="boka"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
     </LinearLayout>
-
-    <EditText
-        android:id="@+id/find_it_query"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/buttons_here"
-        android:layout_centerHorizontal="true"
-        android:ems="10" >
-
-        <requestFocus />
-    </EditText>
-
-    <Button
-        android:id="@+id/find_it_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/linearLayout1"
-        android:layout_centerHorizontal="true"
-        android:text="FIND IT" />
 
     <Button
         android:id="@+id/scan_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/find_it_button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/find_it_button"
+        style="@style/BokaButton"
+        android:background="#2C3E50"
+        android:text="SCAN" />
+
+    <Button
+        android:id="@+id/find_it_button"
+        style="@style/BokaButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/scan_button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:text="SEARCH" />
+
+    <EditText
+        android:id="@+id/find_it_query"
+        style="@style/CustomText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:text="SCAN" />
+        android:ems="10"
+        android:hint="Enter an ISBN" />
 
 </RelativeLayout>

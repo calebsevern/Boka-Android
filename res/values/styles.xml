@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -15,6 +15,24 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+    
+    <style name="CustomText">
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:background">#59ABE3</item>
+        <item name="android:padding">10sp</item>
+    </style>
+    
+    <style name="BokaLogo">
+        <item name="android:textSize">64sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+    
+    <style name="BokaButton">
+        <item name="android:padding">20sp</item>
+        <item name="android:background">#297BB3</item>
+        <item name="android:textColor">#FFFFFF</item>
     </style>
 
 </resources>
